@@ -1,20 +1,25 @@
 node {
-   //def mvnHome
    stage('Preparation') { // for display purposes
       // Get some code from a GitHub repository
       checkout scm
       
       // Get the Maven tool.
-      //mvnHome = tool 'M3'
       env.PATH = "${tool 'M3'}/bin:${env.PATH}"
    }
    stage('Build') {
       // Run the maven build
       if (isUnix()) {
-         sh "'${mvnHome}/bin/mvn' -Dmaven.test.failure.ignore clean package"
+         sh "mvn -Dmaven.test.failure.ignore clean package"
       } else {
-         //bat(/"${mvnHome}\bin\mvn" -Dmaven.test.failure.ignore clean package/)
          bat(/mvn -Dmaven.test.failure.ignore clean package/)
+      }
+   }
+   stage('Deploy') {
+      // Run the maven deploy
+      if (isUnix()) {
+         sh "mvn wildfly:deploy"
+      } else {
+         bat(/mvn wildfly:deploy/)
       }
    }
    stage('Results') {
